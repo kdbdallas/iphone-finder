@@ -71,11 +71,13 @@
 	NSDictionary *fileAttributes;
 	int i, n;
 	
-	if ([NSFm fileExistsAtPath: _path] == NO) {
+	/*if ([NSFm fileExistsAtPath: _path] == NO) {
 		return;
-	}
+	}*/
 	
 	[_files removeAllObjects];
+	
+	_rowCount = 0;
 	
 	NSArray *dirArray = [NSFm directoryContentsAtPath: _path];
 	
@@ -134,7 +136,16 @@
 		{
 			NSString *tmpString = [_path stringByAppendingString:[self selectedFile]];
 			
-			tmpString = [tmpString replaceString: @"//" withString: @"/"];
+			NSMutableString *mstr = [NSMutableString stringWithString: tmpString];
+			
+			[mstr replaceOccurrencesOfString: @"//"
+			                      withString: @"/"
+			                         options: nil
+			                           range: NSMakeRange (0, [mstr length])];
+			
+			tmpString = [NSString stringWithString: mstr];
+			
+			tmpString = [tmpString stringByAppendingString:@"/"];
 			
 			[self setPath:tmpString];
 
