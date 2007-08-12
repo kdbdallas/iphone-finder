@@ -128,26 +128,34 @@
 	NSFileManager *NSFm = [NSFileManager defaultManager];
 	NSDictionary *fileAttributes;
 	
-	fileAttributes = [NSFm fileAttributesAtPath:[_path stringByAppendingString:[self selectedFile]] traverseLink:YES];
+	//NSString *ClickedItem = [_path stringByAppendingString:[self selectedFile]];
+	NSString *ClickedItem = [self selectedFile];
+	
+	NSMutableString *mstr = [NSMutableString stringWithString: ClickedItem];
+	
+	[mstr replaceOccurrencesOfString: @"//"
+	                      withString: @"/"
+	                         options: nil
+	                           range: NSMakeRange (0, [mstr length])];
+	
+	ClickedItem = [NSString stringWithString: mstr];
+
+	fileAttributes = [NSFm fileAttributesAtPath:ClickedItem traverseLink:YES];
 
 	if (fileAttributes != nil)
 	{
 		if ([fileAttributes objectForKey:NSFileType] == NSFileTypeDirectory)
 		{
-			NSString *tmpString = [_path stringByAppendingString:[self selectedFile]];
+			if ([self selectedFile] == @"..")
+			{
+				ClickedItem = @"/sss";
+			}
+			else
+			{
+				ClickedItem = [ClickedItem stringByAppendingString:@"/"];
+			}
 			
-			NSMutableString *mstr = [NSMutableString stringWithString: tmpString];
-			
-			[mstr replaceOccurrencesOfString: @"//"
-			                      withString: @"/"
-			                         options: nil
-			                           range: NSMakeRange (0, [mstr length])];
-			
-			tmpString = [NSString stringWithString: mstr];
-			
-			tmpString = [tmpString stringByAppendingString:@"/"];
-			
-			[self setPath:tmpString];
+			[self setPath:ClickedItem];
 
 			[self reloadData];
 	    }
@@ -156,6 +164,13 @@
 			//Not DIR
 			execlp([_path stringByAppendingString:[self selectedFile]], "sh");
 		}
+	}
+	else
+	{
+		NSException *exception = [NSException exceptionWithName:@"NilFileAttribs"
+		                            reason:ClickedItem  userInfo:nil];
+
+		@throw exception;
 	}
 	
 	//if( [_delegate respondsToSelector:@selector( fileBrowser:fileSelected: )] )
