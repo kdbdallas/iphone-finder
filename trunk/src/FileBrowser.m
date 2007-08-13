@@ -19,6 +19,7 @@
 #import "FileBrowser.h"
 #import <UIKit/UISimpleTableCell.h>
 #include <unistd.h>
+#include <stdio.h>
 
 @implementation FileBrowser 
 - (id)initWithFrame:(struct CGRect)frame{
@@ -127,6 +128,8 @@
 - (void)tableRowSelected:(NSNotification *)notification {
 	NSFileManager *NSFm = [NSFileManager defaultManager];
 	NSDictionary *fileAttributes;
+	int i;
+	BOOL goDownDIR = false;
 	
 	//NSString *ClickedItem = [_path stringByAppendingString:[self selectedFile]];
 	NSString *ClickedItem = [self selectedFile];
@@ -137,8 +140,6 @@
 	                      withString: @"/"
 	                         options: nil
 	                           range: NSMakeRange (0, [mstr length])];
-	
-	ClickedItem = [NSString stringWithString: mstr];
 
 	fileAttributes = [NSFm fileAttributesAtPath:ClickedItem traverseLink:YES];
 
@@ -146,13 +147,24 @@
 	{
 		if ([fileAttributes objectForKey:NSFileType] == NSFileTypeDirectory)
 		{
-			if ([self selectedFile] == @"..")
+			NSArray *arrayOfDIR = [mstr componentsSeparatedByString:@"/"];
+			
+			for (i = 0; i < [arrayOfDIR count]; ++i)
 			{
-				ClickedItem = @"/sss";
+				if ([NSString stringWithString: [arrayOfDIR objectAtIndex: i]] == @"..")
+				{
+					goDownDIR = true;
+				}
+			}
+			
+			if (goDownDIR == false)
+			{
+				ClickedItem = [NSString stringWithString: mstr];
+				ClickedItem = [ClickedItem stringByAppendingString:@"/"];
 			}
 			else
 			{
-				ClickedItem = [ClickedItem stringByAppendingString:@"/"];
+				ClickedItem = @"/test";
 			}
 			
 			[self setPath:ClickedItem];
@@ -162,7 +174,7 @@
 		else
 		{
 			//Not DIR
-			execlp([_path stringByAppendingString:[self selectedFile]], "sh");
+			system([mstr cString]);
 		}
 	}
 	else
