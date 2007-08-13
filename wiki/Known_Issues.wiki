@@ -1,5 +1,5 @@
 #summary Known Issues
 #labels Phase-Support,Phase-QA
 
-* Current Directory does not update correctly when going down a DIR (ex: ..)
-* Quiting a ran program has _issues_
+  * Current Directory does not update correctly when going down a DIR (ex: ..)
+  * Quiting a ran program has _issues_
